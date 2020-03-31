@@ -28,21 +28,17 @@ class EncryptionController {
 
     for (const char of cifrado) {
       if (char.match(/^[a-zA-Z]*$/)) {
-        const i = alphabet.indexOf(char);
+        const i = alphabet.indexOf(char.toLowerCase());
         translate +=
           alphabet[
             i - numero_casas < 0
               ? alphabet.length - (numero_casas - i)
               : i - numero_casas
           ];
-      } else if (char.match(/^\s+$/)) {
-        translate += " ";
       } else {
-        translate += char;
+        translate += char.toLowerCase();
       }
     }
-
-    translate = translate.toLowerCase();
 
     console.log(translate);
     return res.send();

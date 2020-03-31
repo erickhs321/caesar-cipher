@@ -13,7 +13,6 @@ class EncryptionController {
     }
 
     fs.writeFile("./files/answer.json", JSON.stringify(req.data), err => {
-      //Caro ocorra algum erro
       if (err) {
         return res.status(500).json({ error: "error saving file" });
       }

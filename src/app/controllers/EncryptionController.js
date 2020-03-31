@@ -18,6 +18,33 @@ class EncryptionController {
       }
     });
 
+    const { numero_casas, cifrado } = req.data;
+
+    const alphabet = "a b c d e f g h i j k l m n o p q r s t u v w x y z".split(
+      " "
+    );
+
+    let translate = "";
+
+    for (const char of cifrado) {
+      if (char.match(/^[a-zA-Z]*$/)) {
+        const i = alphabet.indexOf(char);
+        translate +=
+          alphabet[
+            i - numero_casas < 0
+              ? alphabet.length - (numero_casas - i)
+              : i - numero_casas
+          ];
+      } else if (char.match(/^\s+$/)) {
+        translate += " ";
+      } else {
+        translate += char;
+      }
+    }
+
+    translate = translate.toLowerCase();
+
+    console.log(translate);
     return res.send();
   }
 }

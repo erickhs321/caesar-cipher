@@ -7,8 +7,8 @@ class EncryptionController {
     try {
       const { data } = await axios.get(`${baseUrl}${req.userToken}`);
       req.data = data;
-    } catch (err) {
-      return res.json(err);
+    } catch ({ message }) {
+      return res.json({ error: message });
     }
 
     console.log(req.data);

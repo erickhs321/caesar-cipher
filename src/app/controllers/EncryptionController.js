@@ -1,9 +1,10 @@
 import axios from "axios";
+import fs from "fs";
 const baseUrl =
   "https://api.codenation.dev/v1/challenge/dev-ps/generate-data?token=";
 
 class EncryptionController {
-  async index(req, res, next) {
+  async index(req, res) {
     try {
       const { data } = await axios.get(`${baseUrl}${req.userToken}`);
       req.data = data;
@@ -11,7 +12,14 @@ class EncryptionController {
       return res.json({ error: message });
     }
 
-    console.log(req.data);
+    fs.writeFile("./files/answer.json", JSON.stringify(req.data), err => {
+      //Caro ocorra algum erro
+      if (err) {
+        return res.status(500).json({ error: "error saving file" });
+      }
+    });
+
+    return res.send();
   }
 }
 

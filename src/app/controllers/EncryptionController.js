@@ -6,7 +6,7 @@ import { resolve } from "path";
 const baseUrl =
   "https://api.codenation.dev/v1/challenge/dev-ps/generate-data?token=";
 
-const caminhoArquivo = resolve("files", "answer.json");
+const pathFile = resolve("files", "answer.json");
 
 class EncryptionController {
   async index(req, res) {
@@ -17,9 +17,9 @@ class EncryptionController {
       return res.json({ error: message });
     }
 
-    fs.writeFile(caminhoArquivo, JSON.stringify(req.data), err => {
+    fs.writeFile(pathFile, JSON.stringify(req.data), err => {
       if (err) {
-        fs.unlink(caminhoArquivo, err => {
+        fs.unlink(pathFile, err => {
           if (err) {
             console.log(err);
           }
@@ -28,33 +28,29 @@ class EncryptionController {
       }
     });
 
-    const { numero_casas, cifrado } = req.data;
+    const { numero_casas: shift, cifrado: encrypted } = req.data;
 
-    const alfabeto = "a b c d e f g h i j k l m n o p q r s t u v w x y z".split(
+    const alphabet = "a b c d e f g h i j k l m n o p q r s t u v w x y z".split(
       " "
     );
 
-    let decifrado = "";
+    let decrypted = "";
 
-    for (const caractere of cifrado) {
-      if (caractere.match(/^[a-zA-Z]*$/)) {
-        const i = alfabeto.indexOf(caractere.toLowerCase());
-        decifrado +=
-          alfabeto[
-            i - numero_casas < 0
-              ? alfabeto.length - (numero_casas - i)
-              : i - numero_casas
-          ];
+    for (const char of encrypted) {
+      if (char.match(/^[a-zA-Z]*$/)) {
+        const i = alphabet.indexOf(char.toLowerCase());
+        decrypted +=
+          alphabet[i - shift < 0 ? alphabet.length - (shift - i) : i - shift];
       } else {
-        decifrado += caractere.toLowerCase();
+        decrypted += char.toLowerCase();
       }
     }
 
-    req.data = { ...req.data, decifrado };
+    req.data = { ...req.data, decifrado: decrypted };
 
-    fs.writeFile(caminhoArquivo, JSON.stringify(req.data), err => {
+    fs.writeFile(pathFile, JSON.stringify(req.data), err => {
       if (err) {
-        fs.unlink(caminhoArquivo, err => {
+        fs.unlink(pathFile, err => {
           if (err) {
             console.log(err);
           }
@@ -63,13 +59,13 @@ class EncryptionController {
       }
     });
 
-    const resumo_criptografico = sha1(decifrado);
+    const hash = sha1(decrypted);
 
-    req.data = { ...req.data, resumo_criptografico };
+    req.data = { ...req.data, resumo_criptografico: hash };
 
-    fs.writeFile(caminhoArquivo, JSON.stringify(req.data), err => {
+    fs.writeFile(pathFile, JSON.stringify(req.data), err => {
       if (err) {
-        fs.unlink(caminhoArquivo, err => {
+        fs.unlink(pathFile, err => {
           if (err) {
             console.log(err);
           }

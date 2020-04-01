@@ -79,7 +79,7 @@ class EncryptionController {
     });
 
     return res.json({
-      message: "the text has been decrypted and saved in the 'awnser.json'"
+      message: "the text has been decrypted and saved in the 'answer.json'"
     });
   }
 }

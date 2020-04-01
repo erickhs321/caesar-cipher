@@ -14,6 +14,11 @@ class EncryptionController {
 
     fs.writeFile("./files/answer.json", JSON.stringify(req.data), err => {
       if (err) {
+        fs.unlink("./files/answer.json", err => {
+          if (err) {
+            console.log(err);
+          }
+        });
         return res.status(500).json({ error: "error saving file" });
       }
     });
@@ -24,23 +29,39 @@ class EncryptionController {
       " "
     );
 
-    let translate = "";
+    let decifrado = "";
 
     for (const char of cifrado) {
       if (char.match(/^[a-zA-Z]*$/)) {
         const i = alphabet.indexOf(char.toLowerCase());
-        translate +=
+        decifrado +=
           alphabet[
             i - numero_casas < 0
               ? alphabet.length - (numero_casas - i)
               : i - numero_casas
           ];
       } else {
-        translate += char.toLowerCase();
+        decifrado += char.toLowerCase();
       }
     }
 
-    console.log(translate);
+    req.data = { ...req.data, decifrado };
+
+    fs.writeFile(
+      "./files/answer.json",
+      JSON.stringify({ ...req.data }),
+      err => {
+        if (err) {
+          fs.unlink("./files/answer.json", err => {
+            if (err) {
+              console.log(err);
+            }
+          });
+          return res.status(500).json({ error: "error saving file" });
+        }
+      }
+    );
+
     return res.send();
   }
 }

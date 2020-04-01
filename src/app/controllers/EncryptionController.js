@@ -1,7 +1,12 @@
 import axios from "axios";
 import fs from "fs";
+import sha1 from "sha1";
+import { resolve } from "path";
+
 const baseUrl =
   "https://api.codenation.dev/v1/challenge/dev-ps/generate-data?token=";
+
+const caminhoArquivo = resolve("files", "answer.json");
 
 class EncryptionController {
   async index(req, res) {
@@ -12,9 +17,9 @@ class EncryptionController {
       return res.json({ error: message });
     }
 
-    fs.writeFile("./files/answer.json", JSON.stringify(req.data), err => {
+    fs.writeFile(caminhoArquivo, JSON.stringify(req.data), err => {
       if (err) {
-        fs.unlink("./files/answer.json", err => {
+        fs.unlink(caminhoArquivo, err => {
           if (err) {
             console.log(err);
           }
@@ -25,44 +30,57 @@ class EncryptionController {
 
     const { numero_casas, cifrado } = req.data;
 
-    const alphabet = "a b c d e f g h i j k l m n o p q r s t u v w x y z".split(
+    const alfabeto = "a b c d e f g h i j k l m n o p q r s t u v w x y z".split(
       " "
     );
 
     let decifrado = "";
 
-    for (const char of cifrado) {
-      if (char.match(/^[a-zA-Z]*$/)) {
-        const i = alphabet.indexOf(char.toLowerCase());
+    for (const caractere of cifrado) {
+      if (caractere.match(/^[a-zA-Z]*$/)) {
+        const i = alfabeto.indexOf(caractere.toLowerCase());
         decifrado +=
-          alphabet[
+          alfabeto[
             i - numero_casas < 0
-              ? alphabet.length - (numero_casas - i)
+              ? alfabeto.length - (numero_casas - i)
               : i - numero_casas
           ];
       } else {
-        decifrado += char.toLowerCase();
+        decifrado += caractere.toLowerCase();
       }
     }
 
     req.data = { ...req.data, decifrado };
 
-    fs.writeFile(
-      "./files/answer.json",
-      JSON.stringify({ ...req.data }),
-      err => {
-        if (err) {
-          fs.unlink("./files/answer.json", err => {
-            if (err) {
-              console.log(err);
-            }
-          });
-          return res.status(500).json({ error: "error saving file" });
-        }
+    fs.writeFile(caminhoArquivo, JSON.stringify(req.data), err => {
+      if (err) {
+        fs.unlink(caminhoArquivo, err => {
+          if (err) {
+            console.log(err);
+          }
+        });
+        return res.status(500).json({ error: "error saving file" });
       }
-    );
+    });
 
-    return res.send();
+    const resumo_criptografico = sha1(decifrado);
+
+    req.data = { ...req.data, resumo_criptografico };
+
+    fs.writeFile(caminhoArquivo, JSON.stringify(req.data), err => {
+      if (err) {
+        fs.unlink(caminhoArquivo, err => {
+          if (err) {
+            console.log(err);
+          }
+        });
+        return res.status(500).json({ error: "error saving file" });
+      }
+    });
+
+    return res.json({
+      message: "the text has been decrypted and saved in the 'awnser.json'"
+    });
   }
 }
 

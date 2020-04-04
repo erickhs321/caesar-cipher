@@ -9,4 +9,6 @@ routes.use(authMiddleware);
 
 routes.get("/", EncryptionController.index);
 
+routes.post("/", EncryptionController.store);
+
 export default routes;

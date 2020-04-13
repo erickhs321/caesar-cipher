@@ -84,7 +84,6 @@ class EncryptionController {
   async store(req, res) {
     let fd = new FormData();
     fd.append("answer", fs.createReadStream(pathFile));
-    console.log(fd);
     let response = {};
 
     try {
@@ -95,16 +94,9 @@ class EncryptionController {
           headers: fd.getHeaders(),
         }
       );
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      return res.json({ error: error.message });
     }
-
-    // console.log(fd.getHeaders());
-
-    // try {
-    // } catch (err) {
-    //   console.log(err);
-    // }
 
     return res.json(response);
   }
